@@ -1,0 +1,18 @@
+dateModified: 1615352458
+email:
+  fromEmail: craftcmstest@mailinator.com
+  fromName: 'CraftCMS Test'
+  transportType: craft\mail\transportadapters\Sendmail
+system:
+  edition: solo
+  live: true
+  name: 'CraftCMS Test'
+  retryDuration: null
+  schemaVersion: 3.6.6
+  timeZone: America/Recife
+users:
+  allowPublicRegistration: false
+  defaultGroup: null
+  photoSubpath: null
+  photoVolumeUid: null
+  requireEmailVerification: true

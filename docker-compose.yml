@@ -1,0 +1,62 @@
+version: '3'
+networks:
+  main:
+
+services:
+
+  Proxy:
+    networks:
+      main:
+        aliases:
+          - "${PROXY_URL}"
+    container_name: "${PROXY_URL}"
+    image: jwilder/nginx-proxy:alpine
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "./proxy.conf:/etc/nginx/conf.d/my_proxy.conf:ro"
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+
+  CraftCMS:
+    networks:
+      main:
+        aliases:
+          - "${CRAFT_URL}"
+    container_name: "${CRAFT_URL}"
+    # image: php:8.0-apache
+    image: craftcms-image
+    build: .Docker/
+    volumes:
+      - ".:/var/www/html/:rw"
+    ports:
+      - ${CRAFT_PORT}
+    environment:
+      APACHE_DOCUMENT_ROOT: '/var/www/html/web/'
+      VIRTUAL_HOST: "${CRAFT_URL}"
+      VIRTUAL_PORT: ${CRAFT_PORT}
+      PORT: ${CRAFT_PORT}
+      APP_ENV: "${ENVIRONMENT}"
+      DEBUG: "true"
+    restart: unless-stopped
+
+  Database:
+    networks:
+      main:
+        aliases:
+          - "${DB_SERVER}"
+    container_name: "${DB_SERVER}"
+    image: mariadb
+    volumes:
+      - "./.data:/var/lib/mysql"
+      - "./Install/dump.sql:/var/lib/mysql/dump.sql:rw"
+    environment:
+      VIRTUAL_HOST: "${DB_SERVER}"
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_DATABASE: "${DB_DATABASE}"
+    restart: always
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    expose:
+      - "${DB_PORT}"
